@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Um Momento Especial...</title>
+    <style>
+        /* Estilo geral da página */
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Container principal */
+        .container {
+            background-color: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            max-width: 90%;
+        }
+        
+        /* Esconde as telas por padrão (o JavaScript decide qual mostrar) */
+        #countdownScreen, #proposalScreen, #confirmationScreen {
+            display: none;
+        }
+
+        /* --- Estilos da Tela de Contagem Regressiva --- */
+        #countdownScreen h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 15px;
+        }
+        #countdownScreen p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        #timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #timer div {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 90px;
+        }
+        #timer div span:first-child {
+            display: block;
+            font-size: 3em;
+            font-weight: bold;
+            color: #e91e63;
+        }
+        #timer div span:last-child {
+            font-size: 1em;
+            color: #333;
+        }
+
+        /* --- Estilos da Tela do Pedido --- */
+        #proposalScreen h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 30px; border: none; border-radius: 10px; font-size: 1.2em;
+            font-weight: bold; cursor: pointer; transition: all 0.3s ease; color: white;
+        }
+        #yesBtn { background-color: #28a745; transform: scale(1.1); }
+        #yesBtn:hover { background-color: #218838; transform: scale(1.2); }
+        #noBtn { background-color: #dc3545; }
+
+        /* --- Estilos da Tela de Confirmação --- */
+        #confirmationScreen h2 { color: #e91e63; font-size: 3em; }
+        #proposalPhoto {
+            max-width: 300px; max-height: 300px; width: auto; height: auto;
+            border-radius: 50%; margin-top: 20px; border: 5px solid #e91e63; object-fit: cover;
+        }
+
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        
+        <div id="countdownScreen">
+            <h1>Algo muito especial está sendo preparado...</h1>
+            <p>E estará disponível em:</p>
+            <div id="timer">
+                <div><span id="days">00</span><span>Dias</span></div>
+                <div><span id="hours">00</span><span>Horas</span></div>
+                <div><span id="minutes">00</span><span>Minutos</span></div>
+                <div><span id="seconds">00</span><span>Segundos</span></div>
+            </div>
+        </div>
+
+        <div id="proposalScreen">
+            <h1>Quer ser minha noiva? ❤️</h1>
+            <div class="button-container">
+                <button id="yesBtn">SIM!</button>
+                <button id="noBtn">Não</button>
+            </div>
+        </div>
+
+        <div id="confirmationScreen">
+            <h2>EU TE AMO! Para sempre.</h2>
+            <img id="proposalPhoto" src="casa.png" alt="Foto do Pedido">
+        </div>
+
+    </div>
+
+    <script>
+        // --- LÓGICA PRINCIPAL: DATA E CONTAGEM REGRESSIVA ---
+
+        // !! IMPORTANTE: Defina a data final aqui !!
+        const targetDate = new Date('2026-08-01T00:00:00').getTime();
+
+        const countdownScreen = document.getElementById('countdownScreen');
+        const proposalScreen = document.getElementById('proposalScreen');
+
+        // Referências para os spans do cronômetro
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        // Função que atualiza o cronômetro
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // Se a data já chegou
+            if (distance <= 0) {
+                clearInterval(countdownInterval); // Para o cronômetro
+                showProposal();
+                return;
+            }
+
+            // Cálculos de tempo
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            // Exibe os resultados no HTML, com 2 dígitos
+            daysEl.innerHTML = String(days).padStart(2, '0');
+            hoursEl.innerHTML = String(hours).padStart(2, '0');
+            minutesEl.innerHTML = String(minutes).padStart(2, '0');
+            secondsEl.innerHTML = String(seconds).padStart(2, '0');
+        }
+        
+        // Função para mostrar a tela de pedido
+        function showProposal() {
+            countdownScreen.style.display = 'none';
+            proposalScreen.style.display = 'block';
+        }
+
+        // Verifica a data assim que a página carrega
+        const now = new Date().getTime();
+        if (now >= targetDate) {
+            showProposal();
+        } else {
+            countdownScreen.style.display = 'block';
+            var countdownInterval = setInterval(updateCountdown, 1000); // Inicia o cronômetro
+        }
+
+        // --- LÓGICA DO PEDIDO (a mesma de antes) ---
+
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const confirmationScreen = document.getElementById('confirmationScreen');
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        function moveButton() {
+            noBtn.style.position = 'absolute';
+            const vw = window.innerWidth, vh = window.innerHeight;
+            const btnW = noBtn.offsetWidth, btnH = noBtn.offsetHeight;
+            noBtn.style.top = `${Math.random() * (vh - btnH)}px`;
+            noBtn.style.left = `${Math.random() * (vw - btnW)}px`;
+        }
+        
+        yesBtn.addEventListener('click', () => {
+            proposalScreen.style.display = 'none';
+            confirmationScreen.style.display = 'block';
+        });
+
+    </script>
+
+</body>
+</html>
