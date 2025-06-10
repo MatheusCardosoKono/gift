@@ -13,8 +13,10 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 20px 0; /* Adiciona um respiro vertical */
+            box-sizing: border-box; /* Garante que padding não afete a altura total */
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            overflow: hidden;
+            overflow-x: hidden; /* Impede rolagem horizontal */
             text-align: center;
         }
 
@@ -26,6 +28,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             max-width: 90%;
+            width: 600px; /* Define uma largura máxima para o desktop */
         }
         
         /* Esconde as telas por padrão (o JavaScript decide qual mostrar) */
@@ -93,6 +96,34 @@
             max-width: 300px; max-height: 300px; width: auto; height: auto;
             border-radius: 50%; margin-top: 20px; border: 5px solid #e91e63; object-fit: cover;
         }
+        
+        /* * =======================================================
+         * AJUSTES PARA CELULAR E TELAS MENORES (RESPONSIVIDADE)
+         * =======================================================
+        */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px; /* Diminui o espaçamento interno */
+                width: 90%;
+            }
+
+            #countdownScreen h1 { font-size: 1.8em; }
+            #countdownScreen p { font-size: 1em; }
+            
+            #timer {
+                flex-direction: column; /* Coloca o cronômetro na vertical */
+                gap: 15px;
+            }
+            #timer div {
+                min-width: 0; /* Remove a largura mínima */
+                padding: 10px;
+            }
+            #timer div span:first-child { font-size: 2.5em; }
+            
+            #proposalScreen h1 { font-size: 2em; }
+            #confirmationScreen h2 { font-size: 2.2em; }
+            #proposalPhoto { max-width: 200px; } /* Diminui o tamanho da foto */
+        }
 
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -130,61 +161,38 @@
     </div>
 
     <script>
-        // --- LÓGICA PRINCIPAL: DATA E CONTAGEM REGRESSIVA ---
-
-        // !! IMPORTANTE: Defina a data final aqui !!
+        // O JavaScript continua o mesmo, não precisa de alteração.
         const targetDate = new Date('2026-08-01T00:00:00').getTime();
-
         const countdownScreen = document.getElementById('countdownScreen');
         const proposalScreen = document.getElementById('proposalScreen');
-
-        // Referências para os spans do cronômetro
-        const daysEl = document.getElementById('days');
-        const hoursEl = document.getElementById('hours');
-        const minutesEl = document.getElementById('minutes');
-        const secondsEl = document.getElementById('seconds');
-
-        // Função que atualiza o cronômetro
+        const daysEl = document.getElementById('days'), hoursEl = document.getElementById('hours'), minutesEl = document.getElementById('minutes'), secondsEl = document.getElementById('seconds');
+        
         function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
-
-            // Se a data já chegou
-            if (distance <= 0) {
-                clearInterval(countdownInterval); // Para o cronômetro
-                showProposal();
-                return;
-            }
-
-            // Cálculos de tempo
+            if (distance <= 0) { clearInterval(countdownInterval); showProposal(); return; }
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            // Exibe os resultados no HTML, com 2 dígitos
             daysEl.innerHTML = String(days).padStart(2, '0');
             hoursEl.innerHTML = String(hours).padStart(2, '0');
             minutesEl.innerHTML = String(minutes).padStart(2, '0');
             secondsEl.innerHTML = String(seconds).padStart(2, '0');
         }
         
-        // Função para mostrar a tela de pedido
         function showProposal() {
             countdownScreen.style.display = 'none';
             proposalScreen.style.display = 'block';
         }
 
-        // Verifica a data assim que a página carrega
         const now = new Date().getTime();
         if (now >= targetDate) {
             showProposal();
         } else {
             countdownScreen.style.display = 'block';
-            var countdownInterval = setInterval(updateCountdown, 1000); // Inicia o cronômetro
+            var countdownInterval = setInterval(updateCountdown, 1000);
         }
-
-        // --- LÓGICA DO PEDIDO (a mesma de antes) ---
 
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
